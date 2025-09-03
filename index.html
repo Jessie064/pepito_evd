@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Google Sheets Web App Demo</title>
+  <style>
+    body {
+     font-family: Arial, sans-serif;
+     margin: 0;
+     background: #f7f7f7;
+     height: 100vh; /* full viewport height */
+     display: flex;
+     align-items: center;
+     justify-content: center;
+}
+    .container {
+      max-width: 500px;
+      margin: auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #074d8f;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #074d8f;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-weight: normal;
+      margin-top: 15px;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+      font-weight: normal;
+    }
+    th, td {
+      text-align: center;
+      font-weight: normal;
+      padding: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Save Data to Google Sheets</h2>
+    
+    <input id="name" type="text" placeholder="Enter name">
+    <input id="score" type="number" placeholder="Enter score">
+    <button id="saveBtn">Save Data</button>
+
+    <h3>Fetch Data</h3>
+    <button id="fetchBtn">Load Data</button>
+    <table id="dataTable" border="1">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Score</th>
+        <th>Timestamp</th>
+      </tr>
+    </thead>
+  </table>
+
+    <div id="output"></div>
+  </div>
+
+  <script>
+    // 🔹 Replace with your Google Apps Script Web App URL
+    const scriptURL = "https://script.google.com/macros/s/AKfycbzp4CbIoR80Er7G8CSokzTK-XQ5NX2APo3o8HDaSCCAJPGQ9Hos8n5znEwnfSgzonxnLg/exec";
+
+    // Save data
+    document.getElementById("saveBtn").addEventListener("click", () => {
+      const payload = {
+        name: document.getElementById("name").value,
+        score: document.getElementById("score").value
+      };
+
+      fetch(scriptURL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.text())
+      .then(msg => alert(msg))
+      .catch(err => console.error("Error:", err));
+    });
+
+    // Fetch data and show as table
+    document.getElementById("fetchBtn").addEventListener("click", () => {
+      fetch(scriptURL)
+        .then(res => res.json())
+        .then(data => {
+          let table = "<table>";
+          data.forEach((row, index) => {
+            table += "<tr>";
+            row.forEach(cell => {
+              if (index === 0) {
+                table += `<th>${cell}</th>`; // headers
+              } else {
+                table += `<td>${cell}</td>`;
+              }
+            });
+            table += "</tr>";
+          });
+          table += "</table>";
+          document.getElementById("output").innerHTML = table;
+        })
+        .catch(err => console.error("Error fetching data:", err));
+    });
+  </script>
+</body>
+</html>
